@@ -115,7 +115,7 @@ pInstruction =  ListI <$$> (((++) <$$ (pInstSeparator) )
 pPoint2D :: Parser Char Point2D
 pPoint2D = P2D <$$> pInteger <** pSyms "," <**> pInteger
 
--- Parser para los routers.
+-- EXTRA: Parser para los routers.
 -- Reconoce el punto de inicio, una serie de puntos intermedios 
 -- y el punto final.
 -- Ex: pLevelMap "I22,3 3,2 7,8 5,3 F9,2"

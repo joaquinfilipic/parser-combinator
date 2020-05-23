@@ -8,6 +8,7 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.List as L
 
+-- Menú principal
 main = do
     clearScreen
     setCursorPosition 0 0
@@ -30,6 +31,8 @@ main = do
                     writeFile "../files/appLayerInstructions.txt" ""
                     bkpMsg <- readFile "../files/netLayerMessageBackup.txt"
                     writeFile "../files/netLayerMessage.txt" bkpMsg
+                    putStrLn "Archivos restaurados. Presione cualquier tecla para continuar:"
+                    getLine
                     main
         "q" -> return ()
         _   -> main
@@ -37,6 +40,7 @@ main = do
 ------------------
 -- Net Layer UI --
 
+-- Menú de la Gramática de Red
 netLayerMain = do
     clearScreen
     setCursorPosition 0 0
@@ -109,7 +113,7 @@ runInstructions net inst func = do
                             if netCompleted newNet
                             then do
                                 drawNet newNet
-                                putStrLn "Mensaje entregado al host destino"
+                                putStrLn "Mensaje entregado al host destino. Presione cualquier tecla para continuar:"
                                 deliverMessage
                                 getLine
                                 main
@@ -180,6 +184,7 @@ deliverMessage = do
 --------------------------
 -- Application Layer UI --
 
+-- Menú de la Gramática de BD
 appLayerMain = do
     clearScreen
     setCursorPosition 0 0

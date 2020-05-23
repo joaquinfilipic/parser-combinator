@@ -1,7 +1,8 @@
 module CombinatorParserLibrary where
+-- Asociatividad izquierda o derecha. El número es el nivel de 
+-- precedencia (0 a 9, de menor a mayor).
 infixr 3 <||>
-infixl 5 <**>
-infixl 5 <$$>, <$$, <**, **>, <***>, <???>
+infixl 5 <**>, <$$>, <$$, <**, **>, <***>, <???>
 infixl 2 `opt`
 
 -----------------------
@@ -15,7 +16,8 @@ infixl 2 `opt`
 type Parser s t =([s] -> [(t, [s])])
 
 -- Función que obtiene el valor final del parseo, dado el parser y la cadena de entrada.
--- Usa clase Either como respuesta, contructor Right para respuesta correcta
+-- Usa clase Either como respuesta, contructor Right para respuesta correcta (primer valor
+-- testigo del array, verificando que no quede resto pendiente)
 parse :: (t -> [(a, [Char])]) -> t -> Either [Char] a
 parse p s = case p s of 
                 ((res,rest):rs) -> if rest == "" then Right res else Left "Erroneous input"
@@ -33,7 +35,7 @@ extract parseFunction = case parseFunction of
 pReturn :: Eq s => a -> Parser s a
 pReturn a = \inp -> [(a, inp)]
 
--- Parser de falla
+-- Parser de falla, devuelve el resultado vacío
 pFail :: Eq s => Parser s a
 pFail = const []
 
@@ -49,7 +51,7 @@ pSym c = \inp -> case inp of
 (<||>) :: Eq s => Parser s a -> Parser s a -> Parser s a
 p1 <||> p2 = \inp -> p1 inp ++ p2 inp
 
--- Combinación secuencial de 2 parsers (producto cartesiano): se le aplica 
+-- Combinación secuencial de 2 parsers: se le aplica 
 -- p1 a la entrada, y para cada uno de los restos de su resultado se le aplica p2. 
 -- Se devuelve el resto de p2 y, como testigo, la aplicación del testigo de p2 
 -- al testigo de p1, que es una función
@@ -95,7 +97,7 @@ pSyms :: Eq s => [s] -> Parser s [s]
 pSyms (x:xs) = (:) <$$> pSym x <**> pSyms xs
 pSyms []     = pReturn []
 
--- Combierten un parser de un elemento en un parser de una secuencia
+-- Convierten un parser de un elemento en un parser de una secuencia
 -- de dichos elementos
 pManyWithEmpty :: Eq s => Parser s a -> Parser s [a]
 pManyWithEmpty p = (:) <$$> p <**> pManyWithEmpty p `opt` []
@@ -112,7 +114,7 @@ applyAll x [] = x
 pPack :: Eq s => [s] -> Parser s a -> [s] -> Parser s a
 pPack o p c = pSyms o **> p <** pSyms c
 
--- Construyen un parser para expresiones con operadores (asociación izq y 
+-- Construyen un parser para expresiones con operadores (asociación izquierda y 
 -- derecha, cada uno). Primer parser de parámetro es para los operadores 
 -- y el segundo para los operandos
 pChainL :: Eq s => Parser s (a -> a -> a) -> Parser s a -> Parser s a

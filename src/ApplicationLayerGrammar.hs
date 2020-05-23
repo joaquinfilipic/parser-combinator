@@ -81,6 +81,8 @@ addElements :: String -> [String]
 addElements el [] map     = map
 addElements el (x:xs) map = addElements el xs (addElement el x map) 
 
+-- Si el elemento no existe, no hace nada. Si existe, le saca el elemento asociado.
+-- Si ahora el elemento queda sin elementos asociados, se borra.
 substractElement :: String -> String -> M.Map String (S.Set String) -> M.Map String (S.Set String)
 substractElement elemName typeName map = 
     case (M.lookup elemName map) of
@@ -95,6 +97,7 @@ substractElements :: String -> [String]
 substractElements el [] map     = map
 substractElements el (x:xs) map = substractElements el xs (substractElement el x map)
 
+-- Elimina forzadamente un elemento con sus asociaciones
 deleteElement :: String -> M.Map String (S.Set String) -> M.Map String (S.Set String)
 deleteElement elemName map = M.delete elemName map
 
@@ -119,7 +122,8 @@ evalLogExp (XOR exp1 exp2) map  = do
 evalLogExp (IFF exp1 exp2) map = not (evalLogExp (XOR exp1 exp2) map)
 
 -- Se fija recursivamente si el elemento es de cierto tipo. Puede serlo
--- por transitividad. En este esquema queda en el usuario no formar loops
+-- por transitividad. 
+-- NOTA: En este esquema, queda en el usuario no formar loops
 isElementOfType :: String -> String -> M.Map String (S.Set String) -> Bool
 isElementOfType el typ map =    if not (M.member el map)
                                 then False
